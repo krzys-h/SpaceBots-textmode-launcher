@@ -100,7 +100,7 @@ do_request("base.js", function(data) {
 	data = data.replace("document.body.removeChild(script);", "// document.body.removeChild(script);");
 	data = data.replace("\"Graphical tutorial\": \"/graphical_tutorial.js\",", "// \"Graphical tutorial\": \"/graphical_tutorial.js\",");
 	data = data.replace("\"GUI\": \"/gui.js\"", "// \"GUI\": \"/gui.js\"");
-	eval(data);
+	eval.call(global, data);
 });
 
 var nesh = require("nesh");
