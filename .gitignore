@@ -1,0 +1,7 @@
+ace/
+node_modules/
+
+*.js
+!start.js
+
+.spacebots_client_history
