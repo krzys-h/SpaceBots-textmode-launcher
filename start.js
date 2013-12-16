@@ -3,15 +3,23 @@ var fs = require('fs');
 var request = require('request');
 var SERVER = "https://amt2013.pl";
 
-var do_request = function(filename, callback) {
-	request.get(SERVER+"/"+filename, function(err, response, data) {
+global.consolemode = {
+	enabled: true
+};
+
+var do_url_request = function(url, callback) {
+	request.get(url, function(err, response, data) {
 		if(err)
-			console.error("Failed to get "+filename+" from "+SERVER+" : "+err);
+			console.error("Failed to get "+url+" : "+err);
 		else if(response.statusCode != 200)
-			console.error("Failed to get "+filename+" from "+SERVER+" : RESPONSE CODE "+response.statusCode);
+			console.error("Failed to get "+url+" : RESPONSE CODE "+response.statusCode);
 		else
 			callback(data);
 	});
+};
+
+var do_request = function(filename, callback) {
+	do_url_request(SERVER+"/"+filename, callback);
 };
 
 global.include = function include(filename) {
@@ -22,7 +30,9 @@ global.include = function include(filename) {
 }
 
 global.include_url = function include_url(url) {
-	console.error("TODO: include_url(\""+url+"\")");
+	do_url_request(url, function(data) {
+		eval.call(global, data);
+	});
 }
 
 function fakeObject() {
