@@ -61,6 +61,9 @@ function fakeElement() {
 		appendChild: function(a, b) {
 			return fakeObject();
 		},
+		removeChild: function(elem) {
+			return;
+		},
 		classList: {
 			add: function(elem) {
 				return;
@@ -87,8 +90,11 @@ document.createElement = function(type)
 document.addEventListener = function(eventname, handler) {
 	return;
 };
+document.querySelector = function(selector) {
+	return fakeElement();
+};
 document.querySelectorAll = function(selector) {
-	return [];
+	return [ fakeElement() ];
 };
 document.body = fakeElement();
 
