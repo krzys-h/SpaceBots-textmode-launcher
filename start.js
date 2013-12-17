@@ -3,6 +3,8 @@ var fs = require('fs');
 var request = require('request');
 var server = "https://amt2013.pl";
 if(process.argv[2]) server = process.argv[2];
+var autostart;
+if(process.argv[3]) autostart = process.argv[3];
 
 global.consolemode = {
 	enabled: true,
@@ -21,21 +23,34 @@ var do_url_request = function(url, callback) {
 };
 
 var do_request = function(filename, callback) {
-	do_url_request(server+"/"+filename, callback);
+	if(filename[0] == "/")
+		do_url_request(server+"/"+filename, callback);
+	else
+		do_url_request(filename, callback);
 };
 
 global.include = function include(filename) {
-	do_request(filename, function(data) {
+	do_request("/"+filename, function(data) {
 		data = data.replace("require('./vectors')", "include('vectors.js')");
 		eval.call(global, data);
 	});
-}
+};
 
 global.include_url = function include_url(url) {
 	do_url_request(url, function(data) {
 		eval.call(global, data);
 	});
-}
+};
+
+global.include_local = function include_local(file) {
+	fs.readFile(file, function(err, data) {
+		if(err) {
+			console.log(err);
+		} else {
+			eval.call(global, data.toString());
+		}
+	});
+};
 
 function fakeObject() {
 	return { prototype: {} };
@@ -88,13 +103,16 @@ var XMLHttpRequest = global.XMLHttpRequest = function() {
 	var rootObject = this;
 	this.send = function()
 	{
-		do_request(this.path.substr(1), function(data) {
+		do_request(this.path, function(data) {
 			data = data.replace("io.connect()", "io.connect(\""+server+"\")");
 			data = data.replace("log_in();", "// log_in();");
 			rootObject.responseText = data;
 			rootObject.onreadystatechange();
 
-			if(rootObject.path == "/user_sprites.js") global.log_in.call(global);
+			if(rootObject.path == "/user_sprites.js") {
+				global.log_in.call(global);
+				if(autostart) include_local(autostart);
+			}
 		});
 	};
 	return this;
@@ -105,7 +123,7 @@ localStorage.tutorial_finished = "true";
 
 include("common.js");
 include("resources.js");
-do_request("base.js", function(data) {
+do_request("/base.js", function(data) {
 	data = data.replace("var script = document.createElement('script');", "// var script = document.createElement('script');");
 	data = data.replace("if(title) script.title = title;", "// if(title) script.title = title;");
 	data = data.replace("script.async = true;", "// script.async = true;");
