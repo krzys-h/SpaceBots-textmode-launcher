@@ -88,8 +88,11 @@ var XMLHttpRequest = global.XMLHttpRequest = function() {
 	{
 		do_request(this.path.substr(1), function(data) {
 			data = data.replace("io.connect()", "io.connect(\""+SERVER+"\")");
+			data = data.replace("log_in();", "// log_in();");
 			rootObject.responseText = data;
 			rootObject.onreadystatechange();
+
+			if(rootObject.path == "/user_sprites.js") global.log_in.call(global);
 		});
 	};
 	return this;
@@ -112,6 +115,10 @@ do_request("base.js", function(data) {
 	data = data.replace("\"GUI\": \"/gui.js\"", "// \"GUI\": \"/gui.js\"");
 	eval.call(global, data);
 });
+
+global.exit = function() {
+	process.exit();
+};
 
 var nesh = require("nesh");
 nesh.config.load();
