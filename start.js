@@ -1,10 +1,12 @@
 var io = global.io = require('socket.io-client');
 var fs = require('fs');
 var request = require('request');
-var SERVER = "https://amt2013.pl";
+var server = "https://amt2013.pl";
+if(process.argv[2]) server = process.argv[2];
 
 global.consolemode = {
-	enabled: true
+	enabled: true,
+	server: server
 };
 
 var do_url_request = function(url, callback) {
@@ -19,7 +21,7 @@ var do_url_request = function(url, callback) {
 };
 
 var do_request = function(filename, callback) {
-	do_url_request(SERVER+"/"+filename, callback);
+	do_url_request(server+"/"+filename, callback);
 };
 
 global.include = function include(filename) {
@@ -87,7 +89,7 @@ var XMLHttpRequest = global.XMLHttpRequest = function() {
 	this.send = function()
 	{
 		do_request(this.path.substr(1), function(data) {
-			data = data.replace("io.connect()", "io.connect(\""+SERVER+"\")");
+			data = data.replace("io.connect()", "io.connect(\""+server+"\")");
 			data = data.replace("log_in();", "// log_in();");
 			rootObject.responseText = data;
 			rootObject.onreadystatechange();
