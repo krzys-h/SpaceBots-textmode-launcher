@@ -70,6 +70,8 @@ function fakeElement() {
 			}
 		},
 		fadeOut: function() {
+		},
+		remove: function() {
 		}
 	};
 }
@@ -77,6 +79,13 @@ function fakeElement() {
 var Element = global.Element = fakeObject();
 var NodeList = global.NodeList = fakeObject();
 var HTMLCollection = global.HTMLCollection = fakeObject();
+
+var Audio = global.Audio = function(filename) {
+	this.play = function() {
+		return;
+	};
+	return;
+};
 
 var document = global.document = fakeObject();
 document.getElementById = function(id)
@@ -126,6 +135,8 @@ var XMLHttpRequest = global.XMLHttpRequest = function() {
 
 var localStorage = global.localStorage = fakeObject();
 localStorage.tutorial_finished = "true";
+
+var explosions = global.explosions = []; // "Destruction & explosions" without "GUI" == problem ;)
 
 include("common.js");
 include("resources.js");

@@ -1,2 +1,4 @@
 node_modules/
+npm-debug.log
+
 .spacebots_client_history
