@@ -125,8 +125,8 @@ var XMLHttpRequest = global.XMLHttpRequest = function() {
 			rootObject.onreadystatechange();
 
 			if(rootObject.path == "/user_sprites.js") {
-				global.log_in.call(global);
 				if(autostart) include_local(autostart);
+				global.log_in.call(global);
 			}
 		});
 	};
