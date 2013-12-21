@@ -1,0 +1,3 @@
+[submodule "SpaceBots"]
+	path = SpaceBots
+	url = git://github.com/mafik/SpaceBots
