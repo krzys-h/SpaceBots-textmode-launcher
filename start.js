@@ -1,14 +1,12 @@
 var io = global.io = require('socket.io-client');
 var fs = require('fs');
+var Promise = global.Promise = require('promise');
 var request = require('request');
-var server = "https://amt2013.pl";
-if(process.argv[2]) server = process.argv[2];
 var autostart;
-if(process.argv[3]) autostart = process.argv[3];
+if(process.argv[2]) autostart = process.argv[2];
 
 global.consolemode = {
-	enabled: true,
-	server: server
+	enabled: true
 };
 
 var do_url_request = function(url, callback) {
@@ -22,15 +20,13 @@ var do_url_request = function(url, callback) {
 	});
 };
 
-var do_request = function(filename, callback) {
-	if(filename[0] == "/")
-		do_url_request(server+"/"+filename, callback);
-	else
-		do_url_request(filename, callback);
+var do_file_request = function(filename, callback) {
+	var data = fs.readFileSync(__dirname+"/SpaceBots/static"+filename).toString();
+	callback(data);
 };
 
 global.include = function include(filename) {
-	do_request("/"+filename, function(data) {
+	do_file_request("/"+filename, function(data) {
 		data = data.replace("require('./vectors')", "include('vectors.js')");
 		eval.call(global, data);
 	});
@@ -107,51 +103,39 @@ document.querySelectorAll = function(selector) {
 };
 document.body = fakeElement();
 
-var XMLHttpRequest = global.XMLHttpRequest = function() {
-	this.open = function(mode, path)
-	{
-		this.mode = mode;
-		this.path = path;
-	};
-	this.onreadystatechange = undefined;
-	this.readyState = 4;
-	var rootObject = this;
-	this.send = function()
-	{
-		do_request(this.path, function(data) {
-			data = data.replace("io.connect()", "io.connect(\""+server+"\")");
-			data = data.replace("log_in();", "// log_in();");
-			rootObject.responseText = data;
-			rootObject.onreadystatechange();
-
-			if(rootObject.path == "/user_sprites.js") {
-				if(autostart) include_local(autostart);
-				global.log_in.call(global);
-			}
-		});
-	};
-	return this;
-};
-
 var localStorage = global.localStorage = fakeObject();
 localStorage.tutorial_finished = "true";
 
 var explosions = global.explosions = []; // "Destruction & explosions" without "GUI" == problem ;)
 
+include("vectors.js");
 include("common.js");
 include("resources.js");
-do_request("/base.js", function(data) {
+do_file_request("/base.js", function(data) {
 	data = data.replace("var script = document.createElement('script');", "// var script = document.createElement('script');");
 	data = data.replace("if(title) script.title = title;", "// if(title) script.title = title;");
 	data = data.replace("script.async = true;", "// script.async = true;");
 	data = data.replace("script.src = data;", "// script.src = data;\ninclude_url(data);");
-	data = data.replace("script.textContent = 'try {' + data + '} catch(e) { console.error(e); }';", "// script.textContent = 'try {' + data + '} catch(e) { console.error(e); }';\n(function() { eval.apply(this.global, arguments); }('try {' + data + '} catch(e) { console.error(e); }'));");
 	data = data.replace("document.body.appendChild(script);", "// document.body.appendChild(script);");
 	data = data.replace("document.body.removeChild(script);", "// document.body.removeChild(script);");
-	data = data.replace("\"Graphical tutorial\": \"/graphical_tutorial.js\",", "// \"Graphical tutorial\": \"/graphical_tutorial.js\",");
-	data = data.replace("\"GUI\": \"/gui.js\"", "// \"GUI\": \"/gui.js\"");
 	eval.call(global, data);
 });
+include("base.js");
+include("logging_in.js");
+include("fail_handler.js");
+include("important_objects.js");
+include("avatar_list.js");
+include("radio.js");
+include("component_reporting.js");
+include("destruction_explosions.js");
+include("impulse_drive.js");
+include("manipulator.js");
+include("laboratory.js");
+include("assembler.js");
+include("user_sprites.js");
+// do NOT include("gui.js");
+
+if(autostart) include_local(autostart);
 
 global.exit = function() {
 	process.exit();
