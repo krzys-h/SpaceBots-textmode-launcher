@@ -3,7 +3,7 @@ var fs = require('fs');
 var Promise = global.Promise = require('promise');
 var request = require('request');
 var autostart;
-if(process.argv[2]) autostart = process.argv[2];
+if(process.argv[1]) autostart = process.argv[1];
 
 global.consolemode = {
 	enabled: true
