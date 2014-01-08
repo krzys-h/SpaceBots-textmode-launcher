@@ -1,0 +1,33 @@
+{
+  "name": "SpaceBots-textmode-launcher",
+  "version": "0.0.1",
+  "description": "Textmode launcher for the SpaceBots game.",
+  "main": "start.js",
+  "dependencies": {
+    "nesh": "1.4.0",
+    "socket.io-client": "*",
+    "optimist": "0.5.2",
+    "promise": "*",
+    "request": "*"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "node start.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/krzys-h/SpaceBots-textmode-launcher.git"
+  },
+  "keywords": [
+    "game",
+    "programming",
+    "spacebots",
+    "space",
+    "bots",
+    "ai",
+    "commandline",
+    "cmd"
+  ],
+  "author": "Krzysztof H. (krzys_h)",
+  "license": ""
+}
