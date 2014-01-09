@@ -3,10 +3,11 @@ var fs = require('fs');
 var Promise = global.Promise = require('promise');
 var request = require('request');
 var autostart;
-if(process.argv[1]) autostart = process.argv[1];
+if(process.argv[2] && process.argv[2] != "-") autostart = process.argv[2];
 
-global.consolemode = {
-	enabled: true
+var consolemode = global.consolemode = {
+	enabled: true,
+	client_dir: __dirname
 };
 
 var do_url_request = function(url, callback) {
@@ -21,7 +22,7 @@ var do_url_request = function(url, callback) {
 };
 
 var do_file_request = function(filename, callback) {
-	var data = fs.readFileSync(__dirname+"/SpaceBots/static"+filename).toString();
+	var data = fs.readFileSync(consolemode.client_dir+"/SpaceBots/static"+filename).toString();
 	callback(data);
 };
 
@@ -39,14 +40,9 @@ global.include_url = function include_url(url) {
 };
 
 global.include_local = function include_local(file) {
-	fs.readFile(file, function(err, data) {
-		if(err) {
-			console.log(err);
-		} else {
-			eval.call(global, data.toString());
-		}
-	});
-};
+	var data = fs.readFileSync(consolemode.client_dir+"/"+file).toString();
+	eval.call(global, data);
+}
 
 function fakeObject() {
 	return { prototype: {} };
@@ -135,9 +131,12 @@ include("assembler.js");
 include("user_sprites.js");
 // do NOT include("gui.js");
 
-if(autostart) include_local(autostart);
+if(autostart) {
+	console.log("Loading autostart file \""+autostart+"\"...");
+	include_local(autostart);
+}
 
-global.exit = function() {
+var exit = global.exit = function() {
 	process.exit();
 };
 
@@ -155,6 +154,6 @@ nesh.start({
 	}
 
 	repl.on('exit', function () {
-		process.exit();
+		global.exit();
 	});
 });
